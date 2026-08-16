@@ -1,0 +1,12 @@
+### Registra un nuovo utente
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "username": "gianpaolo",
+  "email": "gianpaolo@example.com",
+  "password": "password123"
+}
+
+### Elenca tutti gli utenti
+GET http://localhost:8080/api/users
