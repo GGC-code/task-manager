@@ -1,0 +1,48 @@
+@host = http://localhost:8080
+
+### 1) Registra un utente che farà da proprietario
+# @name creaUtente
+POST {{host}}/api/users
+Content-Type: application/json
+
+{
+  "username": "proprietario1",
+  "email": "proprietario1@example.com",
+  "password": "password123"
+}
+
+### 2) Crea una bacheca intestata a quell'utente
+# @name creaBacheca
+POST {{host}}/api/boards
+Content-Type: application/json
+
+{
+  "title": "La mia prima bacheca",
+  "ownerId": {{creaUtente.response.body.id}}
+}
+
+### 3) Elenca tutte le bacheche
+GET {{host}}/api/boards
+
+### 4) Leggi la singola bacheca appena creata
+GET {{host}}/api/boards/{{creaBacheca.response.body.id}}
+
+### 5) (controllo errore) Bacheca inesistente -> deve dare 404
+GET {{host}}/api/boards/9999
+
+### 6) (controllo errore) Proprietario inesistente -> deve dare 404
+POST {{host}}/api/boards
+Content-Type: application/json
+
+{
+  "title": "Bacheca senza padrone",
+  "ownerId": 999999
+}
+
+### 7) (controllo errore) Titolo mancante -> deve dare 400
+POST {{host}}/api/boards
+Content-Type: application/json
+
+{
+  "ownerId": {{creaUtente.response.body.id}}
+}
