@@ -1,0 +1,68 @@
+@host = http://localhost:8080
+
+### 1) Registra un utente (servirà come proprietario della bacheca)
+# @name creaUtente
+POST {{host}}/api/users
+Content-Type: application/json
+
+{
+  "username": "utentecolonne",
+  "email": "utentecolonne@example.com",
+  "password": "password123"
+}
+
+### 2) Crea una bacheca su cui lavorare
+# @name creaBacheca
+POST {{host}}/api/boards
+Content-Type: application/json
+
+{
+  "title": "Bacheca con colonne",
+  "ownerId": {{creaUtente.response.body.id}}
+}
+
+### 3) Aggiungi la prima colonna -> dovrebbe avere position 0
+# @name colonna1
+POST {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+Content-Type: application/json
+
+{
+  "name": "Da fare"
+}
+
+### 4) Aggiungi la seconda colonna -> position 1
+POST {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+Content-Type: application/json
+
+{
+  "name": "In corso"
+}
+
+### 5) Aggiungi la terza colonna -> position 2
+POST {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+Content-Type: application/json
+
+{
+  "name": "Fatto"
+}
+
+### 6) Elenca le colonne della bacheca -> ordinate per position: 0, 1, 2
+GET {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+
+### 7) (controllo errore) Colonna su bacheca inesistente -> deve dare 404
+POST {{host}}/api/boards/999999/columns
+Content-Type: application/json
+
+{
+  "name": "Colonna fantasma"
+}
+
+### 8) (controllo errore) Nome mancante -> deve dare 400
+POST {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+Content-Type: application/json
+
+{
+}
+
+### 9) (controllo errore) Elenco colonne di bacheca inesistente -> deve dare 404
+GET {{host}}/api/boards/999999/columns
