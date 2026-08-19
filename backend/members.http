@@ -1,0 +1,65 @@
+@host = http://localhost:8080
+
+### 1) Utente proprietario della bacheca
+# @name proprietario
+POST {{host}}/api/users
+Content-Type: application/json
+
+{ "username": "propmembri", "email": "propmembri@example.com", "password": "password123" }
+
+### 2) Un utente da aggiungere come membro
+# @name membro
+POST {{host}}/api/users
+Content-Type: application/json
+
+{ "username": "membro1", "email": "membro1@example.com", "password": "password123" }
+
+### 3) Bacheca
+# @name bacheca
+POST {{host}}/api/boards
+Content-Type: application/json
+
+{ "title": "Bacheca condivisa", "ownerId": {{proprietario.response.body.id}} }
+
+### 4) Elenco membri iniziale -> lista vuota []
+GET {{host}}/api/boards/{{bacheca.response.body.id}}/members
+
+### 5) Aggiungi il membro -> 201, roleOnBoard MEMBER
+# @name aggiunta
+POST {{host}}/api/boards/{{bacheca.response.body.id}}/members
+Content-Type: application/json
+
+{ "userId": {{membro.response.body.id}} }
+
+### 6) Elenco membri -> ora contiene un membro
+GET {{host}}/api/boards/{{bacheca.response.body.id}}/members
+
+### 7) (doppione) stesso utente, stessa bacheca -> deve dare 409
+POST {{host}}/api/boards/{{bacheca.response.body.id}}/members
+Content-Type: application/json
+
+{ "userId": {{membro.response.body.id}} }
+
+### 8) (errore) utente inesistente -> 404
+POST {{host}}/api/boards/{{bacheca.response.body.id}}/members
+Content-Type: application/json
+
+{ "userId": 999999 }
+
+### 9) (errore) userId mancante -> 400
+POST {{host}}/api/boards/{{bacheca.response.body.id}}/members
+Content-Type: application/json
+
+{ }
+
+### 10) (errore) membri di bacheca inesistente -> 404
+GET {{host}}/api/boards/999999/members
+
+### 11) Rimuovi il membro -> 204 No Content
+DELETE {{host}}/api/boards/{{bacheca.response.body.id}}/members/{{membro.response.body.id}}
+
+### 12) Elenco membri -> di nuovo vuoto []
+GET {{host}}/api/boards/{{bacheca.response.body.id}}/members
+
+### 13) (errore) rimuovere un membro non iscritto -> 404
+DELETE {{host}}/api/boards/{{bacheca.response.body.id}}/members/{{membro.response.body.id}}
