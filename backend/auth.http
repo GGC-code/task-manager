@@ -1,0 +1,33 @@
+@host = http://localhost:8080
+
+### 1) Registra un utente
+# @name registrazione
+POST {{host}}/api/users
+Content-Type: application/json
+
+{ "username": "utenteauth", "email": "utenteauth@example.com", "password": "password123" }
+
+### 2) Login con credenziali corrette -> 200 + token
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "utenteauth", "password": "password123" }
+
+### 3) Login con password sbagliata -> 401 "Credenziali non valide"
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "utenteauth", "password": "passwordSbagliata" }
+
+### 4) Login con utente inesistente -> stesso 401 "Credenziali non valide"
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "nonesiste", "password": "password123" }
+
+### 5) Login senza password -> 400 (validazione)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "utenteauth" }
