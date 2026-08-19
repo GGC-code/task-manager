@@ -27,10 +27,8 @@ public class BoardService {
         this.userRepository = userRepository;
     }
 
-    public BoardResponse createBoard(CreateBoardRequest request) {
-        // Carichiamo il proprietario dal database a partire dall'id ricevuto.
-        // Se non esiste, rispondiamo 404 invece di lasciar esplodere un errore generico.
-        User owner = userRepository.findById(request.ownerId())
+    public BoardResponse createBoard(CreateBoardRequest request, Long ownerId) {
+        User owner = userRepository.findById(ownerId)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Utente proprietario non trovato"));
 

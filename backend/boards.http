@@ -1,48 +1,87 @@
+# @host = http://localhost:8080
+# questo board.http l'ho fatto quando c'era ancora ownerId
+# ### 1) Registra un utente che farà da proprietario
+# # @name creaUtente
+# POST {{host}}/api/users
+# Content-Type: application/json
+# 
+# {
+#   "username": "proprietario1",
+#   "email": "proprietario1@example.com",
+#   "password": "password123"
+# }
+
+# ### 2) Crea una bacheca intestata a quell'utente
+# # @name creaBacheca
+# POST {{host}}/api/boards
+# Content-Type: application/json
+# 
+# {
+#   "title": "La mia prima bacheca",
+#   "ownerId": {{creaUtente.response.body.id}}
+# }
+
+# ### 3) Elenca tutte le bacheche
+# GET {{host}}/api/boards
+
+# ### 4) Leggi la singola bacheca appena creata
+# GET {{host}}/api/boards/{{creaBacheca.response.body.id}}
+
+# ### 5) (controllo errore) Bacheca inesistente -> deve dare 404
+# GET {{host}}/api/boards/9999
+
+# ### 6) (controllo errore) Proprietario inesistente -> deve dare 404
+# POST {{host}}/api/boards
+# Content-Type: application/json
+# 
+# {
+#   "title": "Bacheca senza padrone",
+#   "ownerId": 999999
+# }
+
+# ### 7) (controllo errore) Titolo mancante -> deve dare 400
+# POST {{host}}/api/boards
+# Content-Type: application/json
+# 
+# {
+#   "ownerId": {{creaUtente.response.body.id}}
+# }
 @host = http://localhost:8080
 
-### 1) Registra un utente che farà da proprietario
-# @name creaUtente
+### 1) Registra un utente
+# @name registrazione
 POST {{host}}/api/users
 Content-Type: application/json
 
-{
-  "username": "proprietario1",
-  "email": "proprietario1@example.com",
-  "password": "password123"
-}
+{ "username": "proptoken", "email": "proptoken@example.com", "password": "password123" }
 
-### 2) Crea una bacheca intestata a quell'utente
-# @name creaBacheca
-POST {{host}}/api/boards
+### 2) Login -> ottieni il token
+# @name login
+POST {{host}}/api/auth/login
 Content-Type: application/json
 
-{
-  "title": "La mia prima bacheca",
-  "ownerId": {{creaUtente.response.body.id}}
-}
+{ "username": "proptoken", "password": "password123" }
 
-### 3) Elenca tutte le bacheche
+### 3) Crea una bacheca con il SOLO titolo + token -> 201, owner = utente del token
+POST {{host}}/api/boards
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{ "title": "La mia bacheca" }
+
+### 4) Elenca le bacheche (con token) -> 200
 GET {{host}}/api/boards
+Authorization: Bearer {{login.response.body.token}}
 
-### 4) Leggi la singola bacheca appena creata
-GET {{host}}/api/boards/{{creaBacheca.response.body.id}}
-
-### 5) (controllo errore) Bacheca inesistente -> deve dare 404
-GET {{host}}/api/boards/9999
-
-### 6) (controllo errore) Proprietario inesistente -> deve dare 404
+### 5) (verifica) creare una bacheca SENZA token -> 401
 POST {{host}}/api/boards
 Content-Type: application/json
 
-{
-  "title": "Bacheca senza padrone",
-  "ownerId": 999999
-}
+{ "title": "Bacheca senza token" }
 
-### 7) (controllo errore) Titolo mancante -> deve dare 400
+### 6) (verifica) il vecchio modo con ownerId nel corpo: il campo ora viene ignorato
 POST {{host}}/api/boards
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
-{
-  "ownerId": {{creaUtente.response.body.id}}
-}
+{ "title": "Con ownerId ignorato", "ownerId": 999999 }

@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.taskmanager.backend.dto.BoardResponse;
 import com.taskmanager.backend.dto.CreateBoardRequest;
+import com.taskmanager.backend.security.SecurityUtils;
 import com.taskmanager.backend.service.BoardService;
+
 
 import jakarta.validation.Valid;
 
@@ -27,10 +29,11 @@ public class BoardController {
         this.boardService = boardService;
     }
 
-    @PostMapping // POST /api/boards -> crea una nuova bacheca
+    @PostMapping
     public ResponseEntity<BoardResponse> createBoard(@Valid @RequestBody CreateBoardRequest request) {
-        BoardResponse created = boardService.createBoard(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created); // 201 Created
+        Long currentUserId = SecurityUtils.getCurrentUserId(); // proprietario = utente autenticato
+        BoardResponse created = boardService.createBoard(request, currentUserId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping // GET /api/boards -> elenco di tutte le bacheche
