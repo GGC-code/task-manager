@@ -1,0 +1,33 @@
+@host = http://localhost:8080
+
+### 1) Registrazione: PUBBLICA, deve funzionare senza token -> 201
+# @name registrazione
+POST {{host}}/api/users
+Content-Type: application/json
+
+{ "username": "utentesicuro", "email": "utentesicuro@example.com", "password": "password123" }
+
+### 2) Rotta protetta SENZA token -> deve dare 401
+GET {{host}}/api/boards
+
+### 3) Login: PUBBLICO -> 200 + token
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "utentesicuro", "password": "password123" }
+
+### 4) Stessa rotta protetta CON token -> ora deve funzionare (200)
+GET {{host}}/api/boards
+Authorization: Bearer {{login.response.body.token}}
+
+### 5) Creazione bacheca CON token -> 201
+POST {{host}}/api/boards
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{ "title": "Bacheca protetta", "ownerId": {{login.response.body.userId}} }
+
+### 6) Rotta protetta con token FASULLO -> deve dare 401
+GET {{host}}/api/boards
+Authorization: Bearer questo.token.e.inventato
