@@ -1,0 +1,100 @@
+@host = http://localhost:8080
+
+### 1) Utente proprietario
+# @name creaUtente
+POST {{host}}/api/users
+Content-Type: application/json
+
+{ "username": "utentetask", "email": "utentetask@example.com", "password": "password123" }
+
+### 2) Un secondo utente, servirà come assegnatario
+# @name creaAssegnatario
+POST {{host}}/api/users
+Content-Type: application/json
+
+{ "username": "assegnatario", "email": "assegnatario@example.com", "password": "password123" }
+
+### 3) Bacheca
+# @name creaBacheca
+POST {{host}}/api/boards
+Content-Type: application/json
+
+{ "title": "Bacheca con task", "ownerId": {{creaUtente.response.body.id}} }
+
+### 4) Prima colonna ("Da fare")
+# @name colonnaDaFare
+POST {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+Content-Type: application/json
+
+{ "name": "Da fare" }
+
+### 5) Seconda colonna ("In corso"), servirà per lo spostamento
+# @name colonnaInCorso
+POST {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+Content-Type: application/json
+
+{ "name": "In corso" }
+
+### 6) Crea un task nella colonna "Da fare" -> position 0, assegnatario null
+# @name task1
+POST {{host}}/api/columns/{{colonnaDaFare.response.body.id}}/tasks
+Content-Type: application/json
+
+{ "title": "Scrivere la documentazione", "description": "Prima bozza" }
+
+### 7) Crea un secondo task nella stessa colonna -> position 1
+POST {{host}}/api/columns/{{colonnaDaFare.response.body.id}}/tasks
+Content-Type: application/json
+
+{ "title": "Rivedere il codice" }
+
+### 8) Elenca i task di "Da fare" -> due task, ordinati 0 e 1
+GET {{host}}/api/columns/{{colonnaDaFare.response.body.id}}/tasks
+
+### 9) GESTO 1 - modifica contenuti del task1 (solo titolo e descrizione)
+PUT {{host}}/api/tasks/{{task1.response.body.id}}
+Content-Type: application/json
+
+{ "title": "Scrivere la documentazione tecnica", "description": "Versione rivista" }
+
+### 10) GESTO 2 - sposta il task1 nella colonna "In corso" (solo columnId)
+PUT {{host}}/api/tasks/{{task1.response.body.id}}
+Content-Type: application/json
+
+{ "columnId": {{colonnaInCorso.response.body.id}} }
+
+### 11) GESTO 3 - assegna il task1 al secondo utente (solo assigneeId)
+PUT {{host}}/api/tasks/{{task1.response.body.id}}
+Content-Type: application/json
+
+{ "assigneeId": {{creaAssegnatario.response.body.id}} }
+
+### 12) Verifica: task1 ora è in "In corso", assegnato, con position 0 nella nuova colonna
+GET {{host}}/api/columns/{{colonnaInCorso.response.body.id}}/tasks
+
+### 13) Rimuovi l'assegnazione (assigneeId = 0 -> torna non assegnato)
+PUT {{host}}/api/tasks/{{task1.response.body.id}}
+Content-Type: application/json
+
+{ "assigneeId": 0 }
+
+### 14) Elimina il task1 -> 204 No Content
+DELETE {{host}}/api/tasks/{{task1.response.body.id}}
+
+### 15) (errore) task inesistente in aggiornamento -> 404
+PUT {{host}}/api/tasks/999999
+Content-Type: application/json
+
+{ "title": "Fantasma" }
+
+### 16) (errore) titolo mancante alla creazione -> 400
+POST {{host}}/api/columns/{{colonnaDaFare.response.body.id}}/tasks
+Content-Type: application/json
+
+{ "description": "Senza titolo" }
+
+### 17) (errore) spostamento verso colonna inesistente -> 404
+PUT {{host}}/api/tasks/{{task1.response.body.id}}
+Content-Type: application/json
+
+{ "columnId": 999999 }
