@@ -14,7 +14,7 @@ function LoginPage() {
     try {
       const data = await login(username, password);
       localStorage.setItem('token', data.token);
-      navigate('/board');
+      navigate('/boards');
     } catch (err) {
       setError('Credenziali non valide. Riprova.');
     }

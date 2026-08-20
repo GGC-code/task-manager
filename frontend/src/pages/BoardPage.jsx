@@ -43,7 +43,13 @@ function BoardPage() {
       ) : (
         <ul>
           {boards.map((board) => (
-            <li key={board.id}>{board.title}</li>
+            <li
+              key={board.id}
+              onClick={() => navigate(`/boards/${board.id}`)}
+              style={{ cursor: 'pointer', textDecoration: 'underline', color: 'blue' }}
+            >
+              {board.title}
+            </li>
           ))}
         </ul>
       )}

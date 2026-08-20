@@ -1,0 +1,93 @@
+@host = http://localhost:8080
+
+### 1) Crea l'utente con cui farai login
+# @name creaUtente
+POST {{host}}/api/users
+Content-Type: application/json
+
+{
+  "username": "provaboard",
+  "email": "provaboard@example.com",
+  "password": "password123"
+}
+
+### 2) Login per ottenere il token
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "provaboard",
+  "password": "password123"
+}
+
+### 3) Crea una bacheca (il proprietario è ricavato dal token)
+# @name creaBacheca
+POST {{host}}/api/boards
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "Bacheca di prova"
+}
+
+### 4) Prima colonna: "Da fare"
+# @name colonnaDaFare
+POST {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "name": "Da fare"
+}
+
+### 5) Seconda colonna: "In corso"
+# @name colonnaInCorso
+POST {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "name": "In corso"
+}
+
+### 6) Terza colonna: "Fatto" (la lasceremo vuota di proposito)
+POST {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "name": "Fatto"
+}
+
+### 7) Un task nella colonna "Da fare"
+POST {{host}}/api/columns/{{colonnaDaFare.response.body.id}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "Scrivere la documentazione",
+  "description": "Prima bozza del capitolo implementazione"
+}
+
+### 8) Un secondo task nella stessa colonna "Da fare"
+POST {{host}}/api/columns/{{colonnaDaFare.response.body.id}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "Rivedere il codice"
+}
+
+### 9) Un task nella colonna "In corso"
+POST {{host}}/api/columns/{{colonnaInCorso.response.body.id}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "Implementare la vista di dettaglio"
+}
+
+### Controllo: elenca le bacheche dell'utente loggato
+GET {{host}}/api/boards
+Authorization: Bearer {{login.response.body.token}}
