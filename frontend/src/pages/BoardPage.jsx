@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getBoards } from '../api/boards';
 
 function BoardPage() {
   const [boards, setBoards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
+  function handleLogout() {
+    localStorage.removeItem('token');
+    navigate('/login');
+  }
   useEffect(() => {
     async function loadBoards() {
       try {
@@ -30,7 +36,8 @@ function BoardPage() {
 
   return (
     <div>
-      <h1>Le mie bacheche</h1>
+            <h1>Le mie bacheche</h1>
+      <button onClick={handleLogout}>Logout</button>
       {boards.length === 0 ? (
         <p>Non hai ancora nessuna bacheca.</p>
       ) : (
