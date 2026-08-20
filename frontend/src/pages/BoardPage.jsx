@@ -1,7 +1,45 @@
+import { useState, useEffect } from 'react';
+import { getBoards } from '../api/boards';
+
 function BoardPage() {
+  const [boards, setBoards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function loadBoards() {
+      try {
+        const data = await getBoards();
+        setBoards(data);
+      } catch (err) {
+        setError('Impossibile caricare le bacheche.');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadBoards();
+  }, []);
+
+  if (loading) {
+    return <p>Caricamento in corso...</p>;
+  }
+
+  if (error) {
+    return <p style={{ color: 'red' }}>{error}</p>;
+  }
+
   return (
     <div>
-      <h1>Pagina della Bacheca</h1>
+      <h1>Le mie bacheche</h1>
+      {boards.length === 0 ? (
+        <p>Non hai ancora nessuna bacheca.</p>
+      ) : (
+        <ul>
+          {boards.map((board) => (
+            <li key={board.id}>{board.title}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
