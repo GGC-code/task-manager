@@ -1,0 +1,115 @@
+@host = http://localhost:8080
+
+### 1) Login per ottenere il token (l'utente provaboard esiste già)
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "provaboard",
+  "password": "password123"
+}
+
+### 2) Crea la bacheca con un nome adatto alla tesi
+# @name creaBacheca
+POST {{host}}/api/boards
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "Sviluppo piattaforma di gestione progetti"
+}
+
+### 3) Colonna "Da fare"
+# @name colonnaDaFare
+POST {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "name": "Da fare"
+}
+
+### 4) Colonna "In corso"
+# @name colonnaInCorso
+POST {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "name": "In corso"
+}
+
+### 5) Colonna "Fatto"
+# @name colonnaFatto
+POST {{host}}/api/boards/{{creaBacheca.response.body.id}}/columns
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "name": "Fatto"
+}
+
+### 6) Task in "Da fare"
+POST {{host}}/api/columns/{{colonnaDaFare.response.body.id}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "Redigere il capitolo sul testing",
+  "description": "Validazione dei requisiti funzionali e non funzionali"
+}
+
+### 7) Task in "Da fare"
+POST {{host}}/api/columns/{{colonnaDaFare.response.body.id}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "Definire la strategia di deploy",
+  "description": "Configurazione dell'ambiente di produzione con PostgreSQL"
+}
+
+### 8) Task in "In corso"
+POST {{host}}/api/columns/{{colonnaInCorso.response.body.id}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "Sviluppare la vista di dettaglio della bacheca",
+  "description": "Colonne e card dei task con distinzione per stato"
+}
+
+### 9) Task in "In corso"
+POST {{host}}/api/columns/{{colonnaInCorso.response.body.id}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "Rifinire l'interfaccia utente",
+  "description": "Foglio di stile coerente e layout responsivo della SPA"
+}
+
+### 10) Task in "Fatto"
+POST {{host}}/api/columns/{{colonnaFatto.response.body.id}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "Implementare l'autenticazione con JWT",
+  "description": "Login, protezione delle rotte e gestione del token"
+}
+
+### 11) Task in "Fatto"
+POST {{host}}/api/columns/{{colonnaFatto.response.body.id}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "title": "Modellare la base di dati",
+  "description": "Entità User, Board, BoardColumn, Task, BoardMembership"
+}
+
+### 12) Controllo: elenca le bacheche dell'utente
+GET {{host}}/api/boards
+Authorization: Bearer {{login.response.body.token}}

@@ -12,12 +12,13 @@ function BoardPage() {
     localStorage.removeItem('token');
     navigate('/login');
   }
+
   useEffect(() => {
     async function loadBoards() {
       try {
         const data = await getBoards();
         setBoards(data);
-      } catch (err) {
+      } catch {
         setError('Impossibile caricare le bacheche.');
       } finally {
         setLoading(false);
@@ -27,28 +28,31 @@ function BoardPage() {
   }, []);
 
   if (loading) {
-    return <p>Caricamento in corso...</p>;
+    return <p className="status-msg">Caricamento in corso...</p>;
   }
 
   if (error) {
-    return <p style={{ color: 'red' }}>{error}</p>;
+    return <p className="status-msg error">{error}</p>;
   }
 
   return (
-    <div>
-            <h1>Le mie bacheche</h1>
-      <button onClick={handleLogout}>Logout</button>
+    <div className="page">
+      <div className="app-bar">
+        <h1>Le mie bacheche</h1>
+        <button className="btn-ghost" onClick={handleLogout}>Logout</button>
+      </div>
+
       {boards.length === 0 ? (
-        <p>Non hai ancora nessuna bacheca.</p>
+        <div className="empty-state">Non hai ancora nessuna bacheca.</div>
       ) : (
-        <ul>
+        <ul className="board-grid">
           {boards.map((board) => (
             <li
               key={board.id}
+              className="board-card"
               onClick={() => navigate(`/boards/${board.id}`)}
-              style={{ cursor: 'pointer', textDecoration: 'underline', color: 'blue' }}
             >
-              {board.title}
+              <div className="board-title">{board.title}</div>
             </li>
           ))}
         </ul>

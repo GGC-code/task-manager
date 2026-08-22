@@ -1,111 +1,268 @@
+/* ============================================================
+   Task Manager — foglio di stile dell'interfaccia
+   Tema chiaro, pensato per una SPA di gestione progetti Kanban.
+   Sostituisce integralmente il contenuto del template di Vite.
+   ============================================================ */
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --bg:            #f4f6f9;
+  --surface:       #ffffff;
+  --surface-muted: #f8fafc;
+  --border:        #e3e7ee;
+  --text:          #1f2633;
+  --text-muted:    #6b7482;
+  --accent:        #4f46e5;
+  --accent-hover:  #4338ca;
+  --accent-soft:   #eef0fe;
+  --danger:        #dc2626;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --todo:     #94a3b8;
+  --progress: #f59e0b;
+  --done:     #10b981;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
+  --radius:    10px;
+  --radius-sm:  8px;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+
+  --sans: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  color-scheme: light;
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
   color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
+  background: var(--bg);
+  color: var(--text);
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+/* ---- tipografia di base ---- */
+h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.01em; margin: 0; color: var(--text); }
+h2 { font-size: 1rem;   font-weight: 600; margin: 0; color: var(--text); }
+p  { margin: 0; }
+
+/* ---- controlli comuni ---- */
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1rem;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-ghost {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+.btn-ghost:hover { background: var(--surface-muted); box-shadow: var(--shadow-sm); }
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+.login-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 2rem;
+}
+.login-card h1 { text-align: center; margin-bottom: 0.35rem; }
+.login-subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.75rem;
+}
+.form  { display: flex; flex-direction: column; gap: 1rem; }
+.field { display: flex; flex-direction: column; gap: 0.35rem; text-align: left; }
+.field label { font-size: 0.85rem; font-weight: 500; color: var(--text-muted); }
+.field input {
+  font: inherit;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.form-error {
+  margin-top: 0.25rem;
+  color: var(--danger);
+  font-size: 0.85rem;
+  text-align: center;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+/* ============================================================
+   LAYOUT DI PAGINA + BARRA SUPERIORE
+   ============================================================ */
+.page {
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem 3rem;
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
+.app-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
 }
-p {
+.app-bar .spacer { flex: 1; }
+
+/* ============================================================
+   ELENCO BACHECHE
+   ============================================================ */
+.board-grid {
+  list-style: none;
   margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.board-card {
+  position: relative;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 2.5rem 1.1rem 1.25rem;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.05s;
+}
+.board-card:hover  { border-color: var(--accent); box-shadow: var(--shadow-md); }
+.board-card:active { transform: translateY(1px); }
+.board-card .board-title { font-weight: 600; color: var(--text); }
+.board-card::after {
+  content: "\2192"; /* freccia: segnala che la card è navigabile */
+  position: absolute;
+  top: 1.05rem;
+  right: 1.2rem;
+  color: var(--text-muted);
+  transition: color 0.15s, transform 0.15s;
+}
+.board-card:hover::after { color: var(--accent); transform: translateX(3px); }
+
+.empty-state {
+  color: var(--text-muted);
+  background: var(--surface-muted);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
+/* ============================================================
+   DETTAGLIO BACHECA — COLONNE KANBAN
+   ============================================================ */
+.board-columns {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+.column {
+  flex: 0 0 280px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--todo);
+  border-radius: var(--radius);
+  padding: 0.85rem;
+}
+.column.is-progress { border-top-color: var(--progress); }
+.column.is-done     { border-top-color: var(--done); }
+
+.column-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  padding: 0 0.15rem;
+}
+.column-header .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--todo); }
+.column.is-progress .column-header .dot { background: var(--progress); }
+.column.is-done     .column-header .dot { background: var(--done); }
+.column-header h2 { flex: 1; }
+.column-header .count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  min-width: 22px;
+  height: 22px;
   display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.task-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.task-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.8rem;
+  box-shadow: var(--shadow-sm);
+  text-align: left;
 }
+.task-card .task-title { font-weight: 600; color: var(--text); }
+.task-card .task-desc  { margin-top: 0.3rem; font-size: 0.9rem; color: var(--text-muted); }
+.task-card .task-assignee {
+  margin-top: 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+}
+.column-empty { color: var(--text-muted); font-size: 0.9rem; padding: 0.25rem 0.15rem; }
+
+/* ---- stati di caricamento / errore a pagina intera ---- */
+.status-msg { padding: 2rem; text-align: center; color: var(--text-muted); }
+.status-msg.error { color: var(--danger); }

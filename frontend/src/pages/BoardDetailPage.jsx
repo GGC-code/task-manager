@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getBoardDetail } from '../api/columns';
 
+// Associa il nome della colonna al relativo stato del flusso Kanban,
+// così l'intestazione mostra il colore corretto (da fare, in corso, fatto).
+function statusClass(name) {
+  const n = (name || '').trim().toLowerCase();
+  if (['in corso', 'in progress', 'doing'].includes(n)) return 'is-progress';
+  if (['fatto', 'completato', 'done'].includes(n)) return 'is-done';
+  return 'is-todo';
+}
+
 function BoardDetailPage() {
   // Legge l'id della bacheca dal percorso, es. /boards/42 -> boardId = "42".
   const { boardId } = useParams();
@@ -16,7 +25,7 @@ function BoardDetailPage() {
       try {
         const data = await getBoardDetail(boardId);
         setColumns(data);
-      } catch (err) {
+      } catch {
         setError('Impossibile caricare il dettaglio della bacheca.');
       } finally {
         setLoading(false);
@@ -26,50 +35,51 @@ function BoardDetailPage() {
   }, [boardId]);
 
   if (loading) {
-    return <p>Caricamento in corso...</p>;
+    return <p className="status-msg">Caricamento in corso...</p>;
   }
 
   if (error) {
-    return <p style={{ color: 'red' }}>{error}</p>;
+    return <p className="status-msg error">{error}</p>;
   }
 
   return (
-    <div>
-      <button onClick={() => navigate('/boards')}>Torna alle bacheche</button>
-      <h1>Dettaglio bacheca</h1>
+    <div className="page">
+      <div className="app-bar">
+        <button className="btn-ghost" onClick={() => navigate('/boards')}>
+          &larr; Torna alle bacheche
+        </button>
+        <h1>Dettaglio bacheca</h1>
+        <span className="spacer" />
+      </div>
 
       {columns.length === 0 ? (
-        <p>Questa bacheca non ha ancora colonne.</p>
+        <div className="empty-state">Questa bacheca non ha ancora colonne.</div>
       ) : (
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+        <div className="board-columns">
           {columns.map((column) => (
-            <div
-              key={column.id}
-              style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '0.5rem', minWidth: '200px' }}
-            >
-              <h2>{column.name}</h2>
+            <section key={column.id} className={`column ${statusClass(column.name)}`}>
+              <header className="column-header">
+                <span className="dot" />
+                <h2>{column.name}</h2>
+                <span className="count">{column.tasks.length}</span>
+              </header>
 
               {column.tasks.length === 0 ? (
-                <p style={{ color: '#888' }}>Nessun task.</p>
+                <p className="column-empty">Nessun task</p>
               ) : (
-                <ul style={{ listStyle: 'none', padding: 0 }}>
+                <ul className="task-list">
                   {column.tasks.map((task) => (
-                    <li
-                      key={task.id}
-                      style={{ border: '1px solid #ddd', borderRadius: '4px', padding: '0.5rem', marginBottom: '0.5rem' }}
-                    >
-                      <strong>{task.title}</strong>
-                      {task.description && <p style={{ margin: '0.25rem 0 0' }}>{task.description}</p>}
+                    <li key={task.id} className="task-card">
+                      <p className="task-title">{task.title}</p>
+                      {task.description && <p className="task-desc">{task.description}</p>}
                       {task.assigneeUsername && (
-                        <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: '#555' }}>
-                          Assegnato a: {task.assigneeUsername}
-                        </p>
+                        <span className="task-assignee">Assegnato a {task.assigneeUsername}</span>
                       )}
                     </li>
                   ))}
                 </ul>
               )}
-            </div>
+            </section>
           ))}
         </div>
       )}
